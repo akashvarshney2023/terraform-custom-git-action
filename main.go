@@ -40,7 +40,7 @@ func validateTags(modules map[string]string) {
 			return
 		}
 		if !hasLatest {
-			fmt.Printf("\033[33mWarning:\033[0m The %s is not the latest version. Please consider using the latest tag, which is %s.\n", moduleName, latestTag)
+			fmt.Printf("\033[33mWarning: The %s is not the latest version. Please consider using the latest tag, which is %s.\033[0m", moduleName, latestTag)
 		}
 	}
 
