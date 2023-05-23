@@ -1,22 +1,13 @@
 provider "azurerm" {
-  features {
+  features {}
+}
 
+module "rg_module" {
+  source = "git::https://github.com/akashvarshney2023/terraform-module-rg.git?ref=1.0.0"
+  resource_group_name = "test-resource-group"
+  location = "westus2"
+  tags = {
+    environment = "production"
+    owner       = "Akash"
   }
-
-}
-
-module "resource_rg" {
-  source                         = "./modules/rg"
-  module_resource_group_name     = var.rg_name
-  module_resource_group_location = var.rg_location
-}
-
-
-module "vnet" {
-  source              = "./modules/vnet"
-  location            = var.rg_location
-  resource_group_name = var.resource_group_name
-  vnet_name           = var.vnet_name
-  address_space       = var.address_space
-  subnet              = var.subnets
 }
