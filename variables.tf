@@ -1,2 +1,3 @@
 variable "generic" {}
 variable "rg" {}
+
