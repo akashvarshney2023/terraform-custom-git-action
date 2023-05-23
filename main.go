@@ -34,19 +34,14 @@ func validateTags(modules map[string]string) {
 			return
 		}
 
-		latesttg, hasLatest, err := HasLatestTag(repoURL, tag)
+		latestTag, hasLatest, err := HasLatestTag(repoURL, tag)
 		if err != nil {
 			fmt.Println("Error:", err)
 			return
 		}
 		if !hasLatest {
-			fmt.Println("version is old")
-			fmt.Printf("The %s is not the latest version. Please consider using the latest tag, which is %s.\n", moduleName, latesttg)
-
+			fmt.Printf("\033[33mWarning:\033[0m The %s is not the latest version. Please consider using the latest tag, which is %s.\n", moduleName, latestTag)
 		}
-		//isLatestTag(repoURL)
-		fmt.Println(moduleName)
-		fmt.Println(tag)
 	}
 
 }
@@ -128,7 +123,7 @@ func HasLatestTag(repoURL, tag string) (string, bool, error) {
 		return latestTag, true, nil
 	}
 
-	return tag, false, nil
+	return latestTag, false, nil
 }
 
 type Tag struct {
