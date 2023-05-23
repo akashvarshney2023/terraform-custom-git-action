@@ -39,7 +39,7 @@ func validateTags(modules map[string]string) {
 			fmt.Println("Error:", err)
 			return
 		}
-		if hasLatest {
+		if !hasLatest {
 			fmt.Printf("The %s is not the latest version. Please consider using the latest tag, which is %s.\n", moduleName, latestTag)
 
 		}
