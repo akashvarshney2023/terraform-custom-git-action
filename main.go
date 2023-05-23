@@ -34,14 +34,14 @@ func validateTags(modules map[string]string) {
 			return
 		}
 
-		latestTag, hasLatest, err := HasLatestTag(repoURL, tag)
+		latesttg, hasLatest, err := HasLatestTag(repoURL, tag)
 		if err != nil {
 			fmt.Println("Error:", err)
 			return
 		}
-		if hasLatest {
+		if !hasLatest {
 			fmt.Println("version is old")
-			fmt.Printf("The %s is not the latest version. Please consider using the latest tag, which is %s.\n", moduleName, latestTag)
+			fmt.Printf("The %s is not the latest version. Please consider using the latest tag, which is %s.\n", moduleName, latesttg)
 
 		}
 		//isLatestTag(repoURL)
@@ -63,13 +63,6 @@ func getModuleList(workingDir string) map[string]string {
 	for moduleName, module := range config.ModuleCalls {
 		moduleList[moduleName] = module.Source
 	}
-
-	for moduleName, moduleSource := range moduleList {
-		fmt.Printf("Module Name: %s\n", moduleName)
-		fmt.Printf("Module Source: %s\n", moduleSource)
-		fmt.Println()
-	}
-
 	return moduleList
 }
 
