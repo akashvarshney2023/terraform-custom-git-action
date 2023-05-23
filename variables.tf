@@ -1,0 +1,2 @@
+variable "generic" {}
+variable "rg" {}
