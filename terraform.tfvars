@@ -1,17 +1,17 @@
 ## Contains parameters for RGs.
 rg = {
   rg1 = {
-    rg_name  = "rg-terraform-001" 
-    location = "eastus"    
+    rg_name  = "rg-terraform-001"
+    location = "eastus"
   }
   rg2 = {
     rg_name  = "rg-terraform-002"
-    location = "eastus" 
+    location = "eastus"
   }
 }
 
 generic = {
   tags = {
-    applicationname = "terraformTesting"    
+    applicationname = "terraformTesting"
   }
 }
