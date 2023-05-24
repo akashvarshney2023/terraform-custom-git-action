@@ -13,104 +13,92 @@ import (
 )
 
 func main() {
-	// Readcheck the Terraform configuration file
 	workingDir, err := os.Getwd()
 	if err != nil {
 		fmt.Printf("Failed to get current working directory: %v\n", err)
 		os.Exit(1)
 	}
-	modules := getModuleList(workingDir)
-	// Validate module tags
+
+	modules, err := getModuleList(workingDir)
+	if err != nil {
+		fmt.Printf("Error getting module list: %v\n", err)
+		os.Exit(1)
+	}
+
 	validateTags(modules)
 }
 
-// Verify if the module is the latest version based on its tags
 func validateTags(modules map[string]string) {
-
 	for moduleName, moduleSource := range modules {
-		repoURL, tag, err := ParseRepoURLAndTag(moduleSource)
+		repoURL, tag, err := parseRepoURLAndTag(moduleSource)
 		if err != nil {
-			fmt.Println("Error:", err)
-			return
+			fmt.Printf("Error parsing repo URL and tag: %v\n", err)
+			continue
 		}
 
-		latestTag, hasLatest, err := HasLatestTag(repoURL, tag)
+		latestTag, hasLatest, err := hasLatestTag(repoURL, tag)
 		if err != nil {
-			fmt.Println("Error:", err)
-			return
+			fmt.Printf("Error checking latest tag: %v\n", err)
+			continue
 		}
+
 		if !hasLatest {
-			fmt.Printf("\033[33mWarning: The module \033[36m %s \033[36m \033[33m is not the latest version. Please consider using the latest tag, which is\033[33m \033[36m %s\033[36m\n", moduleName, latestTag)
+			fmt.Printf("\033[33mWarning: The module \033[36m%s\033[33m is not the latest version. Please consider using the latest tag, which is \033[36m%s\033[33m\n", moduleName, latestTag)
 		}
 	}
-
 }
 
-// Get the module list and name on the given specific path
-func getModuleList(workingDir string) map[string]string {
+func getModuleList(workingDir string) (map[string]string, error) {
 	config, err := tfconfig.LoadModule(workingDir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error loading Terraform configuration: %s/n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("error loading Terraform configuration: %s", err)
 	}
 
 	moduleList := make(map[string]string)
 	for moduleName, module := range config.ModuleCalls {
 		moduleList[moduleName] = module.Source
 	}
-	return moduleList
+	return moduleList, nil
 }
 
-func ParseRepoURLAndTag(input string) (string, string, error) {
-	// Remove the "git::" prefix if present
+func parseRepoURLAndTag(input string) (string, string, error) {
 	input = strings.TrimPrefix(input, "git::")
 
-	// Parse the input as a URL
 	u, err := url.Parse(input)
 	if err != nil {
 		return "", "", err
 	}
 
-	// Extract the repository URL
 	repoURL := u.Scheme + "://" + u.Host + u.Path
-
-	// Extract the tag from the query parameters
 	tag := u.Query().Get("ref")
 
 	return repoURL, tag, nil
 }
 
-func HasLatestTag(repoURL, tag string) (string, bool, error) {
-	// Extract the owner and repository name from the URL
+func hasLatestTag(repoURL, tag string) (string, bool, error) {
 	parts := strings.Split(repoURL, "/")
 	owner := parts[len(parts)-2]
 	repoWithGit := parts[len(parts)-1]
-	// Remove the ".git" suffix from the repository name
 	repo := strings.TrimSuffix(repoWithGit, ".git")
-	// Construct the GitHub API URL for tags
 	apiURL := fmt.Sprintf("https://api.github.com/repos/%s/%s/tags", owner, repo)
 
-	// Send an HTTP GET request to the API
 	resp, err := http.Get(apiURL)
 	if err != nil {
 		return tag, false, err
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return tag, false, err
 	}
 
-	// Parse the response body as an array of tags
 	var tags []Tag
 	err = json.Unmarshal(body, &tags)
 	if err != nil {
 		return tag, false, err
 	}
 
-	// Find the latest tag
 	latestTag := ""
 	for _, t := range tags {
 		if latestTag == "" || t.Name > latestTag {
@@ -118,7 +106,6 @@ func HasLatestTag(repoURL, tag string) (string, bool, error) {
 		}
 	}
 
-	// Compare the latest tag with the provided tag
 	if latestTag == tag {
 		return latestTag, true, nil
 	}
