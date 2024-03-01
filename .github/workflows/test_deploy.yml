@@ -7,4 +7,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run my action
-      uses: akashvarshney2023/tf-naming-check@develop
+      uses: akashvarshney2023/tf-naming-check@develop     
+      with:
+        entrypoint: /bin/sh
+        args: -c "ls -al /app && python /app/main.py"
