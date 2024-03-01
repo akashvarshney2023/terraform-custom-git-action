@@ -1,4 +1,4 @@
-name: TEST Workflo
+name: TEST Workflow
 on: [push]
 
 jobs:
@@ -7,7 +7,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run my action
-      uses: akashvarshney2023/tf-naming-check@develop     
-      with:
-        entrypoint: /bin/sh
-        args: -c "ls -al /app && python /app/main.py"
+      uses: akashvarshney2023/tf-naming-check@develop
