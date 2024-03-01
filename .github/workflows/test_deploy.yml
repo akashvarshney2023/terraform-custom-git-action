@@ -1,4 +1,4 @@
-name: TEST Workflow
+name: TEST Workflo
 on: [push]
 
 jobs:
